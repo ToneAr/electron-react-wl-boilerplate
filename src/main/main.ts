@@ -12,6 +12,7 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import nodeChildProcess from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -30,6 +31,30 @@ ipcMain.on('ipc-example', async (event, arg) => {
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
 });
+
+// WL Socket
+const startWLsocket = () => {
+  const script = nodeChildProcess.spawn('wolframscript.exe', [
+    '-script',
+    './wl/deploy.wls',
+    '-p',
+    '4848',
+  ]);
+
+  console.log(`WL pid: ${script.pid}`);
+
+  script.stdout.on('data', (data) => {
+    console.log(`WL stdout: ${data}`);
+  });
+  script.stderr.on('data', (err) => {
+    console.log(`WL stderr: ${err}`);
+  });
+  script.on('exit', (code) => {
+    console.log(`WL exit code: ${code}`);
+  });
+};
+ipcMain.on('start-wl', startWLsocket);
+// ---------
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
