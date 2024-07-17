@@ -23,4 +23,3 @@ Inside the `./wl/` are all the files used for the definitions and deployment of 
 ## Linting
 
 ESLint and Prettier are both enabled which are linters that flag errors, improper syntax, suspicious constructs and stylistic errors.
-
