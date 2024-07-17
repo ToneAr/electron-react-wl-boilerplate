@@ -265,7 +265,7 @@ export default class MenuBuilder {
 										this.mainWindow.webContents.toggleDevTools();
 									},
 								},
-							]
+						  ]
 						: [
 								{
 									label: 'Toggle &Full Screen',
@@ -276,7 +276,7 @@ export default class MenuBuilder {
 										);
 									},
 								},
-							],
+						  ],
 			},
 			{
 				label: 'Help',
