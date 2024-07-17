@@ -20,7 +20,7 @@ node_modules
 
 release/app/dist
 release/build
-.erb/dll
+.misc/dll
 
 .idea
 npm-debug.log.*
@@ -29,4 +29,5 @@ npm-debug.log.*
 *.scss.d.ts
 
 # Dev
-*.dev.*
+*.dev.nb
+*.dev.wl

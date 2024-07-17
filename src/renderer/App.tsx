@@ -1,16 +1,16 @@
 import React from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import {
-  Typography,
-  Stack,
-  Button,
-  TextField,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-  SelectChangeEvent,
-  Paper,
+	Typography,
+	Stack,
+	Button,
+	TextField,
+	MenuItem,
+	Select,
+	InputLabel,
+	FormControl,
+	SelectChangeEvent,
+	Paper,
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -20,111 +20,117 @@ import localRequest from '../hooks/localRequest';
 import './App.css';
 
 const theme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
+	palette: {
+		mode: 'dark',
+	},
 });
 
 function Demo() {
-  const [evaluator, setEvaluator] = React.useState<
-    'Python' | 'NodeJS' | 'Shell'
-  >('Python');
-  const [evaluatorInput, setEvaluatorInput] = React.useState<string>('');
-  const [wlEvaluatorInput, setWLEvaluatorInput] = React.useState<string>('');
-  const [result, setResult] = React.useState<string | null>(null);
+	const [evaluator, setEvaluator] = React.useState<
+		'Python' | 'NodeJS' | 'Shell'
+	>('Python');
+	const [evaluatorInput, setEvaluatorInput] = React.useState<string>('');
+	const [wlEvaluatorInput, setWLEvaluatorInput] = React.useState<string>('');
+	const [result, setResult] = React.useState<string | null>(null);
 
-  const handleEvaluatorChange = (e: SelectChangeEvent): void => {
-    setEvaluator(e.target.value as 'Python' | 'NodeJS' | 'Shell');
-  };
-  const handleEvaluatorInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ): void => {
-    setEvaluatorInput(e.target.value as string);
-  };
-  const handleEvaluatorClick = async (): Promise<void> => {
-    const res = await localRequest(`/evaluate-${evaluator}`, {
-      in: evaluatorInput,
-    });
-    setResult(res);
-  };
+	const handleEvaluatorChange = (e: SelectChangeEvent): void => {
+		setEvaluator(e.target.value as 'Python' | 'NodeJS' | 'Shell');
+	};
+	const handleEvaluatorInputChange = (
+		e: React.ChangeEvent<HTMLInputElement>,
+	): void => {
+		setEvaluatorInput(e.target.value as string);
+	};
+	const handleEvaluatorClick = async (): Promise<void> => {
+		const res = await localRequest(`/evaluate-${evaluator}`, {
+			in: evaluatorInput,
+		});
+		setResult(res);
+	};
 
-  const handleWLEvaluateClick = async (): Promise<void> => {
-    const res = await localRequest(`/evaluate`, {
-      in: wlEvaluatorInput,
-    });
-    setResult(res);
-  };
-  const handleWLInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ): void => {
-    setWLEvaluatorInput(e.target.value as string);
-  };
+	const handleWLEvaluateClick = async (): Promise<void> => {
+		const res = await localRequest(`/evaluate`, {
+			in: wlEvaluatorInput,
+		});
+		setResult(res);
+	};
+	const handleWLInputChange = (
+		e: React.ChangeEvent<HTMLInputElement>,
+	): void => {
+		setWLEvaluatorInput(e.target.value as string);
+	};
 
-  return (
-    <Stack
-      className="Hello"
-      direction="column"
-      spacing={2}
-      sx={{ textAlign: 'center', alignContent: 'center' }}
-      justifyContent="center"
-    >
-      <Typography variant="h2">Electron + ReactTS + WolframLanguage</Typography>
-      <Stack spacing={2} direction="row">
-        <TextField
-          variant="filled"
-          label="WL Input"
-          color="primary"
-          sx={{ width: 450 }}
-          onChange={handleWLInputChange}
-        />
-        <Button variant="contained" onClick={handleWLEvaluateClick}>
-          Evaluate
-        </Button>
-      </Stack>
-      <Stack spacing={2} direction="row">
-        <FormControl>
-          <InputLabel id="evaluator-label">Evaluator</InputLabel>
-          <Select
-            labelId="evaluator-label"
-            label="Evaluator"
-            sx={{ width: 130 }}
-            value={evaluator}
-            onChange={handleEvaluatorChange}
-          >
-            <MenuItem value="Python">Python</MenuItem>
-            <MenuItem value="NodeJS">NodeJS</MenuItem>
-            <MenuItem value="Shell">Shell</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          variant="filled"
-          label="External Input"
-          color="primary"
-          sx={{ width: 300 }}
-          onChange={handleEvaluatorInputChange}
-        />
-        <Button variant="contained" onClick={handleEvaluatorClick}>
-          Evaluate
-        </Button>
-      </Stack>
-      {result ? (
-        <Paper sx={{ maxWidth: '50%', p: 2 }} elevation={3} variant="outlined">
-          {result}
-        </Paper>
-      ) : null}
-    </Stack>
-  );
+	return (
+		<Stack
+			className="Hello"
+			direction="column"
+			spacing={2}
+			sx={{ textAlign: 'center', alignContent: 'center' }}
+			justifyContent="center"
+		>
+			<Typography variant="h2">
+				Electron + ReactTS + WolframLanguage
+			</Typography>
+			<Stack spacing={2} direction="row">
+				<TextField
+					variant="filled"
+					label="WL Input"
+					color="primary"
+					sx={{ width: 450 }}
+					onChange={handleWLInputChange}
+				/>
+				<Button variant="contained" onClick={handleWLEvaluateClick}>
+					Evaluate
+				</Button>
+			</Stack>
+			<Stack spacing={2} direction="row">
+				<FormControl>
+					<InputLabel id="evaluator-label">Evaluator</InputLabel>
+					<Select
+						labelId="evaluator-label"
+						label="Evaluator"
+						sx={{ width: 130 }}
+						value={evaluator}
+						onChange={handleEvaluatorChange}
+					>
+						<MenuItem value="Python">Python</MenuItem>
+						<MenuItem value="NodeJS">NodeJS</MenuItem>
+						<MenuItem value="Shell">Shell</MenuItem>
+					</Select>
+				</FormControl>
+				<TextField
+					variant="filled"
+					label="External Input"
+					color="primary"
+					sx={{ width: 300 }}
+					onChange={handleEvaluatorInputChange}
+				/>
+				<Button variant="contained" onClick={handleEvaluatorClick}>
+					Evaluate
+				</Button>
+			</Stack>
+			{result ? (
+				<Paper
+					sx={{ maxWidth: '50%', p: 2 }}
+					elevation={3}
+					variant="outlined"
+				>
+					{result}
+				</Paper>
+			) : null}
+		</Stack>
+	);
 }
 
 export default function App() {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/" element={<Demo />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
-  );
+	return (
+		<ThemeProvider theme={theme}>
+			<CssBaseline />
+			<Router>
+				<Routes>
+					<Route path="/" element={<Demo />} />
+				</Routes>
+			</Router>
+		</ThemeProvider>
+	);
 }
