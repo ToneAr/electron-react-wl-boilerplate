@@ -123,7 +123,7 @@ const configuration: webpack.Configuration = {
 						manifest: require(manifest),
 						sourceType: 'var',
 					}),
-				]),
+			  ]),
 
 		new webpack.NoEmitOnErrorsPlugin(),
 
