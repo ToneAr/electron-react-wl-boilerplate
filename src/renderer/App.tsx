@@ -32,6 +32,34 @@ function Demo() {
 	const [evaluatorInput, setEvaluatorInput] = React.useState<string>('');
 	const [wlEvaluatorInput, setWLEvaluatorInput] = React.useState<string>('');
 	const [result, setResult] = React.useState<string | null>(null);
+	const [isWLReady, setIsWLReady] = React.useState<boolean>(false);
+
+	// eslint-disable-next-line consistent-return
+	const aliveQ = async () => {
+		const resp = await localRequest('aliveQ').then(
+			(res) => res,
+			(err) => {
+				console.log(err);
+			},
+		);
+		const wait = () =>
+			new Promise((resolve) => {
+				setTimeout(() => {
+					resolve('');
+				}, 500);
+			});
+		if (!resp) {
+			console.log('ping WL socket failed');
+			await wait();
+			aliveQ();
+			return;
+		}
+		console.log('ping WL succeeded');
+		setIsWLReady(true);
+	};
+	React.useEffect(() => {
+		aliveQ();
+	});
 
 	const handleEvaluatorChange = (e: SelectChangeEvent): void => {
 		setEvaluator(e.target.value as 'Python' | 'NodeJS' | 'Shell');
@@ -79,7 +107,12 @@ function Demo() {
 					sx={{ width: 450 }}
 					onChange={handleWLInputChange}
 				/>
-				<Button variant="contained" onClick={handleWLEvaluateClick}>
+				<Button
+					variant="contained"
+					onClick={handleWLEvaluateClick}
+					// eslint-disable-next-line react/jsx-props-no-spreading
+					{...(!isWLReady ? { disabled: true } : {})}
+				>
 					Evaluate
 				</Button>
 			</Stack>
@@ -105,16 +138,17 @@ function Demo() {
 					sx={{ width: 300 }}
 					onChange={handleEvaluatorInputChange}
 				/>
-				<Button variant="contained" onClick={handleEvaluatorClick}>
+				<Button
+					variant="contained"
+					onClick={handleEvaluatorClick}
+					// eslint-disable-next-line react/jsx-props-no-spreading
+					{...(!isWLReady ? { disabled: true } : {})}
+				>
 					Evaluate
 				</Button>
 			</Stack>
 			{result ? (
-				<Paper
-					sx={{ maxWidth: '50%', p: 2 }}
-					elevation={3}
-					variant="outlined"
-				>
+				<Paper sx={{ maxWidth: '50%', p: 2 }} variant="outlined">
 					{result}
 				</Paper>
 			) : null}

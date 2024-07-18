@@ -1,5 +1,6 @@
 URLDispatcher[
   {
+	"/aliveQ" -> APIFunction[{}, True &], 				(* Use this as a heartbeat test *)
     "/evaluate"~~EndOfString ->
       APIFunction[{"in"->"String"},
         ToExpression[#in]&

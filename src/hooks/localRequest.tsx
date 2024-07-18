@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios, { AxiosHeaderValue } from 'axios';
 
 export default async function localRequest(
 	endpoint: string,
-	dataIn: any = {},
+	dataIn: Object = {},
 	port: number = 4848,
-) {
+): Promise<any> {
 	axios.defaults.baseURL = `http://localhost:${port}`;
 	const response = await axios.post(endpoint, null, {
 		params: dataIn,
