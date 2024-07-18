@@ -38,18 +38,17 @@ function Demo() {
 	const aliveQ = async () => {
 		const resp = await localRequest('aliveQ').then(
 			(res) => res,
-			(err) => {
-				console.log(err);
+			() => {
+				console.log('ping WL failed');
 			},
 		);
 		const wait = () =>
 			new Promise((resolve) => {
 				setTimeout(() => {
 					resolve('');
-				}, 500);
+				}, 250);
 			});
 		if (!resp) {
-			console.log('ping WL socket failed');
 			await wait();
 			aliveQ();
 			return;
@@ -58,7 +57,9 @@ function Demo() {
 		setIsWLReady(true);
 	};
 	React.useEffect(() => {
-		aliveQ();
+		if (!isWLReady) {
+			aliveQ();
+		}
 	});
 
 	const handleEvaluatorChange = (e: SelectChangeEvent): void => {
@@ -110,8 +111,7 @@ function Demo() {
 				<Button
 					variant="contained"
 					onClick={handleWLEvaluateClick}
-					// eslint-disable-next-line react/jsx-props-no-spreading
-					{...(!isWLReady ? { disabled: true } : {})}
+					disabled={!isWLReady}
 				>
 					Evaluate
 				</Button>
@@ -141,8 +141,7 @@ function Demo() {
 				<Button
 					variant="contained"
 					onClick={handleEvaluatorClick}
-					// eslint-disable-next-line react/jsx-props-no-spreading
-					{...(!isWLReady ? { disabled: true } : {})}
+					disabled={!isWLReady}
 				>
 					Evaluate
 				</Button>
