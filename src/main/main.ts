@@ -35,6 +35,9 @@ ipcMain.on('ipc-example', async (event, arg) => {
 // WL Socket
 const startWLsocket = () => {
 	const script = nodeChildProcess.spawn('wolframscript.exe', [
+		'-noinit',
+		'-noprompt',
+		'-rawterm',
 		'-script',
 		'./wl/deploy.wls',
 		'-p',

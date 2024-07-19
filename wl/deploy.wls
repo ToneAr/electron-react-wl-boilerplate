@@ -1,9 +1,8 @@
-
-(* PacletInstall[ "WREL/LocalDeploy" ]*)
+#!/usr/bin/env wolframscript
 
 Print[ "Initialising LocalDeploy`..." ];
 Quiet[
-    PacletInstall[CloudObject["PacletSites/Wolfram/LocalDeploy"], ForceVersionInstall->True],
+    PacletInstall[CloudObject["PacletSites/Wolfram/LocalDeploy"]],
     PacletInstall::samevers
 ];
 <<LocalDeploy`;

@@ -11,6 +11,7 @@ import {
 	FormControl,
 	SelectChangeEvent,
 	Paper,
+	CircularProgress,
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -87,6 +88,21 @@ function Demo() {
 		e: React.ChangeEvent<HTMLInputElement>,
 	): void => {
 		setWLEvaluatorInput(e.target.value as string);
+	};
+
+	if (!isWLReady) {
+		return (
+			<Stack
+				className="Hello"
+				direction="column"
+				spacing={2}
+				sx={{ textAlign: 'center', alignContent: 'center' }}
+				justifyContent="center"
+			>
+				<Typography variant="h3">Getting things set up...</Typography>
+				<CircularProgress size={60} />
+			</Stack>
+		);
 	};
 
 	return (
