@@ -1,3 +1,4 @@
+// Packages
 import React from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import {
@@ -12,12 +13,14 @@ import {
 	SelectChangeEvent,
 	Paper,
 	CircularProgress,
+	CssBaseline,
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+
+// Hooks
 import localRequest from '../hooks/localRequest';
 
-// import icon from '../../assets/icon.svg';
+// Styles
 import './App.css';
 
 const theme = createTheme({
@@ -103,7 +106,7 @@ function Demo() {
 				<CircularProgress size={60} />
 			</Stack>
 		);
-	};
+	}
 
 	return (
 		<Stack
@@ -162,7 +165,7 @@ function Demo() {
 					Evaluate
 				</Button>
 			</Stack>
-			{result ? (
+			{result && typeof result !== 'object' ? (
 				<Paper sx={{ maxWidth: '50%', p: 2 }} variant="outlined">
 					{result}
 				</Paper>
