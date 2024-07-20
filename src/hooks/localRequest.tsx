@@ -1,4 +1,4 @@
-import axios, { AxiosHeaderValue } from 'axios';
+import axios from 'axios';
 
 export default async function localRequest(
 	endpoint: string,
