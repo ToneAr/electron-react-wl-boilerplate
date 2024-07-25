@@ -2,7 +2,9 @@
 
 Print[ "Initialising LocalDeploy`..." ];
 Quiet[
-    PacletInstall[CloudObject["PacletSites/Wolfram/LocalDeploy"]],
+	If[FailureQ@PacletObject["LocalDeploy"],
+    	PacletInstall[CloudObject["PacletSites/Wolfram/LocalDeploy"]]
+	],
     PacletInstall::samevers
 ];
 <<LocalDeploy`;
@@ -12,9 +14,10 @@ SetDirectory[ DirectoryName[$InputFileName] ];
 dispatcher = Import[ "dispatcher.wl" ];
 
 Print[ "Parsing arguments..." ];
+<<CommandLineParse.wxf;
 port = Quiet[
-    ResourceFunction["CommandLineParse"][$CommandLine, {"--port", "-p"}] /. {
-        { OrderlessPatternSequence[Failure[__], {a_}] } :> ToExpression[a],
+    CommandLineParse[$CommandLine, {"-p","--port"}] /. {
+        { OrderlessPatternSequence[Failure[__], {a_String}] } :> ToExpression[a],
         { Repeated[_Failure, {2}] } :> 4848 (* Default Port*)
     },
     {
@@ -24,7 +27,15 @@ port = Quiet[
 ];
 Print[ "Deploying dispatcher...","\n" ];
 Print[ "---------------- LocalDeploy: "<>ToString[PacletObject["LocalDeploy"]["Version"]]<>" ---------------" ];
+
 KeyValueMap[
+(*
+	Prints a line for each endpoint in the form:
+		Endpoints:
+			/endpoint1: 'Head of deployment @ /endpoint1'
+			/endpoint2: 'Head of deployment @ /endpoint2'
+			...
+*)
     If[#1=="Endpoints",
         Print["Endpoints:"];
         KeyValueMap[Print["    ",ToString[#1]<>": "<>ToString[Head[First[#2]]]]&, #2],
