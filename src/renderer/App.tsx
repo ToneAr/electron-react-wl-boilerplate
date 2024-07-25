@@ -26,6 +26,9 @@ import './App.css';
 const theme = createTheme({
 	palette: {
 		mode: 'dark',
+		primary: {
+			main: '#ee0915',
+		},
 	},
 });
 
