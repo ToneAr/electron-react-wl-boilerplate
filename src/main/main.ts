@@ -122,6 +122,14 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 // Wolfram Language
+function checkWL(): boolean {
+	try {
+		nodeChildProcess.execSync('wolframscript -version');
+		return true;
+	} catch (error) {
+		return false;
+	}
+}
 function startWL() {
 	const wlProc = nodeChildProcess.spawn('wolframscript.exe', [
 		'-noinit',
@@ -146,6 +154,13 @@ function startWL() {
 		// mainWindow.webContents.send('wl-exit', code);
 		startWL();
 	});
+}
+if (!checkWL()) {
+	dialog.showErrorBox(
+		'wolframscript not found',
+		'Please install it and try again.',
+	);
+	app.quit();
 }
 ipcMain.on('start-wl', startWL);
 // ---------
