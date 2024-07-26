@@ -13,7 +13,6 @@ import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import nodeChildProcess from 'child_process';
-import * as fs from 'fs';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
