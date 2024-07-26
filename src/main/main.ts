@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import nodeChildProcess from 'child_process';
@@ -25,39 +25,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-	console.log(msgTemplate(arg));
-	event.reply('ipc-example', msgTemplate('pong'));
-});
-
-// WL Socket
-const startWLsocket = () => {
-	const script = nodeChildProcess.spawn('wolframscript.exe', [
-		'-noinit',
-		'-noprompt',
-		'-rawterm',
-		'-script',
-		'./wl/deploy.wls',
-		'-p',
-		'4848',
-	]);
-
-	console.log(`WL pid: ${script.pid}`);
-
-	script.stdout.on('data', (data) => {
-		console.log(`WL stdout: ${data}`);
-	});
-	script.stderr.on('data', (err) => {
-		console.log(`WL stderr: ${err}`);
-	});
-	script.on('exit', (code) => {
-		console.log(`WL exit code: ${code}`);
-	});
-};
-ipcMain.on('start-wl', startWLsocket);
-// ---------
 
 if (process.env.NODE_ENV === 'production') {
 	const sourceMapSupport = require('source-map-support');
@@ -146,6 +113,56 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
+
+ipcMain.on('ipc-example', async (event, arg) => {
+	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+	console.log(msgTemplate(arg));
+	event.reply('ipc-example', msgTemplate('pong'));
+});
+
+// Wolfram Language
+function checkWL(): boolean {
+	try {
+		nodeChildProcess.execSync('wolframscript -version');
+		return true;
+	} catch (error) {
+		return false;
+	}
+}
+function startWL() {
+	const wlProc = nodeChildProcess.spawn('wolframscript.exe', [
+		'-noinit',
+		'-noprompt',
+		'-rawterm',
+		'-script',
+		'./wl/deploy.wls',
+		'-p',
+		'4848',
+	]);
+
+	console.log(`WL pid: ${wlProc.pid}`);
+
+	wlProc.stdout.on('data', (data) => {
+		console.log(`WL stdout: ${data}`);
+	});
+	wlProc.stderr.on('data', (err) => {
+		console.log(`WL stderr: ${err}`);
+	});
+	wlProc.on('exit', (code) => {
+		console.log(`WL exit code: ${code}`);
+		// mainWindow.webContents.send('wl-exit', code);
+		startWL();
+	});
+}
+if (!checkWL()) {
+	dialog.showErrorBox(
+		'wolframscript not found',
+		'Please install it and try again.',
+	);
+	app.quit();
+}
+ipcMain.on('start-wl', startWL);
+// ---------
 
 app.on('window-all-closed', () => {
 	// Respect the OSX convention of having the application in memory even

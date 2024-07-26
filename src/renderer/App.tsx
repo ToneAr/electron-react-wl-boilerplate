@@ -39,13 +39,15 @@ function Demo() {
 	const [evaluatorInput, setEvaluatorInput] = React.useState<string>('');
 	const [wlEvaluatorInput, setWLEvaluatorInput] = React.useState<string>('');
 	const [result, setResult] = React.useState<string | null>(null);
-	const [isWLReady, setIsWLReady] = React.useState<boolean>(false);
+	const [isReady, setIsReady] = React.useState<boolean>(false);
+	const [isWLActive, setIsWLActive] = React.useState<boolean>(false);
 
 	// eslint-disable-next-line consistent-return
 	const aliveQ = async () => {
 		const resp = await localRequest('aliveQ').then(
 			(res) => res,
 			() => {
+				// eslint-disable-next-line no-console
 				console.log('ping WL failed');
 			},
 		);
@@ -56,18 +58,25 @@ function Demo() {
 				}, 250);
 			});
 		if (!resp) {
+			setIsWLActive(false);
 			await wait();
 			aliveQ();
 			return;
 		}
+		// eslint-disable-next-line no-console
 		console.log('ping WL succeeded');
-		setIsWLReady(true);
+		setIsWLActive(true);
+		setIsReady(true);
 	};
 	React.useEffect(() => {
-		if (!isWLReady) {
-			aliveQ();
-		}
-	});
+		const intervalId = setInterval(() => {
+			if (!isReady) {
+				aliveQ();
+			}
+		}, 1000);
+		return () => clearInterval(intervalId);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const handleEvaluatorChange = (e: SelectChangeEvent): void => {
 		setEvaluator(e.target.value as 'Python' | 'NodeJS' | 'Shell');
@@ -78,17 +87,21 @@ function Demo() {
 		setEvaluatorInput(e.target.value as string);
 	};
 	const handleEvaluatorClick = async (): Promise<void> => {
-		const res = await localRequest(`/evaluate-${evaluator}`, {
+		await localRequest(`/evaluate-${evaluator}`, {
 			in: evaluatorInput,
-		});
-		setResult(res);
+		})
+			.then((res) => setResult(res))
+			// eslint-disable-next-line no-console
+			.catch((err) => console.log(err));
 	};
 
 	const handleWLEvaluateClick = async (): Promise<void> => {
-		const res = await localRequest(`/evaluate`, {
+		await localRequest(`/evaluate`, {
 			in: wlEvaluatorInput,
-		});
-		setResult(res);
+		})
+			.then((res) => setResult(res))
+			// eslint-disable-next-line no-console
+			.catch((err) => console.log(err));
 	};
 	const handleWLInputChange = (
 		e: React.ChangeEvent<HTMLInputElement>,
@@ -96,7 +109,7 @@ function Demo() {
 		setWLEvaluatorInput(e.target.value as string);
 	};
 
-	if (!isWLReady) {
+	if (!isReady) {
 		return (
 			<Stack
 				className="Hello"
@@ -105,7 +118,7 @@ function Demo() {
 				sx={{ textAlign: 'center', alignContent: 'center' }}
 				justifyContent="center"
 			>
-				<Typography variant="h3">Getting things set up...</Typography>
+				<Typography variant="h3">Loading...</Typography>
 				<CircularProgress size={60} />
 			</Stack>
 		);
@@ -133,7 +146,7 @@ function Demo() {
 				<Button
 					variant="contained"
 					onClick={handleWLEvaluateClick}
-					disabled={!isWLReady}
+					disabled={!isWLActive}
 				>
 					Evaluate
 				</Button>
@@ -163,7 +176,7 @@ function Demo() {
 				<Button
 					variant="contained"
 					onClick={handleEvaluatorClick}
-					disabled={!isWLReady}
+					disabled={!isWLActive}
 				>
 					Evaluate
 				</Button>
