@@ -47,6 +47,7 @@ function Demo() {
 		const resp = await localRequest('aliveQ').then(
 			(res) => res,
 			() => {
+				// eslint-disable-next-line no-console
 				console.log('ping WL failed');
 			},
 		);
@@ -62,6 +63,7 @@ function Demo() {
 			aliveQ();
 			return;
 		}
+		// eslint-disable-next-line no-console
 		console.log('ping WL succeeded');
 		setIsWLActive(true);
 		setIsReady(true);
@@ -89,6 +91,7 @@ function Demo() {
 			in: evaluatorInput,
 		})
 			.then((res) => setResult(res))
+			// eslint-disable-next-line no-console
 			.catch((err) => console.log(err));
 	};
 
@@ -97,6 +100,7 @@ function Demo() {
 			in: wlEvaluatorInput,
 		})
 			.then((res) => setResult(res))
+			// eslint-disable-next-line no-console
 			.catch((err) => console.log(err));
 	};
 	const handleWLInputChange = (
