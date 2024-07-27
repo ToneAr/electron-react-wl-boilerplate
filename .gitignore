@@ -30,4 +30,4 @@ npm-debug.log.*
 
 # Dev
 *.dev.nb
-*.dev.wl
+*.dev.wl*

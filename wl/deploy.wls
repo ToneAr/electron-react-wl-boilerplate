@@ -1,39 +1,38 @@
 #!/usr/bin/env wolframscript
-
-Print[ "Initialising LocalDeploy`..." ];
-Quiet[
-	If[FailureQ@PacletObject["LocalDeploy"],
-    	PacletInstall[CloudObject["PacletSites/Wolfram/LocalDeploy"]]
-	],
-    PacletInstall::samevers
-];
-<<LocalDeploy`;
-
-Print[ "Importing dispatcher.wl..." ];
 SetDirectory[ DirectoryName[$InputFileName] ];
-expressions = Import[ "expressions.wl" ];
+<<EchoTemporaryCLI.wxf
 
-(* Print[ "Parsing arguments..." ];
-<<CommandLineParse.wxf;
-port = Quiet[
-    CommandLineParse[$CommandLine, {"-p","--port"}] /. {
-        { OrderlessPatternSequence[Failure[__], {a_String}] } :> ToExpression[a],
-        { Repeated[_Failure, {2}] } :> 4848 (* Default Port*)
-    },
-    {
-        StringPart::partw,Part::partd,Part::take,
-        StringMatchQ::strse,Part::partw,Part::pkspec1
-    }
-]; *)
+EchoTemporaryCLI[
+	Quiet[
+		If[FailureQ@PacletObject["LocalDeploy"],
+			PacletInstall[CloudObject["PacletSites/Wolfram/LocalDeploy"]]
+		],
+		PacletInstall::samevers
+	];
+	<<LocalDeploy`;
+	,
+	"Initialising LocalDeploy`..."
+];
 
-Print["Launching parallel kernels..."];
-LaunchKernels[ Min[{ Length[expressions], $ProcessorCount * 2 }] ];
+EchoTemporaryCLI[
+	expressions = Import[ "expressions.wl" ];
+	,
+	"Importing dispatcher.wl..."
+];
 
-Print["Distributing definitions..."];
-DistributeDefinitions[LocalDeploy];
+EchoTemporaryCLI[
+	LaunchKernels[ Min[{ Length[expressions], $ProcessorCount * 2 }] ];
+	,
+	"Launching parallel kernels..."
+];
 
-Print[ "Deploying WL expressions...","\n" ];
-Print[ "---------------- LocalDeploy: "<>ToString[PacletObject["LocalDeploy"]["Version"]]<>" ---------------", "\n"];
+EchoTemporaryCLI[
+	DistributeDefinitions[LocalDeploy];
+	,
+	"Distributing definitions..."
+];
+
+Print[ "\n","---------------- LocalDeploy: "<>ToString[PacletObject["LocalDeploy"]["Version"]]<>" ---------------", "\n"];
 
 WaitAll[
 	Function[{
@@ -41,30 +40,36 @@ WaitAll[
 			expr
 		},
 		ParallelSubmit[
-			KeyValueMap[
-				(*
-					Prints a line for each endpoint in the form:
-						Endpoints:
-							/endpoint1: 'Head of deployment @ /endpoint1'
-							/endpoint2: 'Head of deployment @ /endpoint2'
-							...
-				*)
-				If[#1=="Endpoints",
-					Print["Endpoints:"];
-					KeyValueMap[Print["\t",ToString[#1]<>": "<>ToString[Head[First[#2]]]]&, #2],
-					Print[#1<>": ", #2];
-				]&,
-				LocalDeploy[
-					expr,
-					port
-				]//First
-			];
-			Print["\n"];
+			Print[
+				StringJoin @
+				KeyValueMap[{propName, prop}|->
+					If[propName=="Endpoints",
+						{
+							"Endpoints:","\n",
+							Sequence @@ KeyValueMap[{endpoint, iconizedExpr}|->
+								{
+									"\t",ToString[endpoint],": ",
+									ToString[ Head@*First@iconizedExpr ],
+									"\n"
+								},
+								prop
+							]
+						}
+						,
+						{
+							propName,": ",ToString[prop],"\n"
+						}
+					]
+					,
+					LocalDeploy[
+						expr,
+						port
+					]//First
+				]
+			]
 		]
 	] @@@ expressions
 ];
-
-(* Print[ "--------------------------------------------------","\n" ]; *)
 
 Pause[0.1];
 
