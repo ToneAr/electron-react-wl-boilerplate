@@ -136,8 +136,6 @@ function startWL() {
 		'-rawterm',
 		'-script',
 		'./wl/deploy.wls',
-		'-p',
-		'4848',
 	]);
 
 	console.log(`WL pid: ${wlProc.pid}`);
@@ -150,7 +148,10 @@ function startWL() {
 	});
 	wlProc.on('exit', (code) => {
 		console.log(`WL exit code: ${code}`);
-		// mainWindow.webContents.send('wl-exit', code);
+		dialog.showErrorBox(
+			'wolframscript has quit unexpectedly',
+			'Will attempt to restart the process.',
+		);
 		startWL();
 	});
 }
@@ -159,7 +160,7 @@ if (!checkWL()) {
 		'wolframscript not found',
 		'Please install it and try again.',
 	);
-	app.quit();
+	app.exit(1);
 }
 ipcMain.on('start-wl', startWL);
 // ---------
