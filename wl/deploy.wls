@@ -11,9 +11,9 @@ Quiet[
 
 Print[ "Importing dispatcher.wl..." ];
 SetDirectory[ DirectoryName[$InputFileName] ];
-dispatcher = Import[ "dispatcher.wl" ];
+expressions = Import[ "expressions.wl" ];
 
-Print[ "Parsing arguments..." ];
+(* Print[ "Parsing arguments..." ];
 <<CommandLineParse.wxf;
 port = Quiet[
     CommandLineParse[$CommandLine, {"-p","--port"}] /. {
@@ -24,29 +24,47 @@ port = Quiet[
         StringPart::partw,Part::partd,Part::take,
         StringMatchQ::strse,Part::partw,Part::pkspec1
     }
-];
-Print[ "Deploying dispatcher...","\n" ];
-Print[ "---------------- LocalDeploy: "<>ToString[PacletObject["LocalDeploy"]["Version"]]<>" ---------------" ];
+]; *)
 
-KeyValueMap[
-(*
-	Prints a line for each endpoint in the form:
-		Endpoints:
-			/endpoint1: 'Head of deployment @ /endpoint1'
-			/endpoint2: 'Head of deployment @ /endpoint2'
-			...
-*)
-    If[#1=="Endpoints",
-        Print["Endpoints:"];
-        KeyValueMap[Print["    ",ToString[#1]<>": "<>ToString[Head[First[#2]]]]&, #2],
-        Print[#1<>": ", #2]
-    ]&,
-    LocalDeploy[
-        dispatcher,
-        port
-    ]//First
+Print["Launching parallel kernels..."];
+LaunchKernels[ Min[{ Length[expressions], $ProcessorCount * 2 }] ];
+
+Print["Distributing definitions..."];
+DistributeDefinitions[LocalDeploy];
+
+Print[ "Deploying WL expressions...","\n" ];
+Print[ "---------------- LocalDeploy: "<>ToString[PacletObject["LocalDeploy"]["Version"]]<>" ---------------", "\n"];
+
+WaitAll[
+	Function[{
+			port,
+			expr
+		},
+		ParallelSubmit[
+			KeyValueMap[
+				(*
+					Prints a line for each endpoint in the form:
+						Endpoints:
+							/endpoint1: 'Head of deployment @ /endpoint1'
+							/endpoint2: 'Head of deployment @ /endpoint2'
+							...
+				*)
+				If[#1=="Endpoints",
+					Print["Endpoints:"];
+					KeyValueMap[Print["\t",ToString[#1]<>": "<>ToString[Head[First[#2]]]]&, #2],
+					Print[#1<>": ", #2];
+				]&,
+				LocalDeploy[
+					expr,
+					port
+				]//First
+			];
+			Print["\n"];
+		]
+	] @@@ expressions
 ];
-Print[ "--------------------------------------------------","\n" ];
+
+(* Print[ "--------------------------------------------------","\n" ]; *)
 
 Pause[0.1];
 

@@ -44,7 +44,7 @@ function Demo() {
 
 	// eslint-disable-next-line consistent-return
 	const aliveQ = async () => {
-		const resp = await localRequest('aliveQ').then(
+		const resp = await localRequest('aliveQ', {}, 8888).then(
 			(res) => res,
 			() => {
 				// eslint-disable-next-line no-console
