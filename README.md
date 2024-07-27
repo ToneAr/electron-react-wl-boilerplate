@@ -10,7 +10,7 @@ Packaging the application for distribution can be done by running `npm run packa
 
 ## Wolfram Language
 
-Inside the `./wl/` are all the files used for the definitions and deployment of the wolfram language socket. These come as 2 files:
+Inside the `./wl/` are all the files used for the definitions and deployment of the wolfram language socket. These come as 2 main files:
 
 1. dispatcher.wl
 
@@ -36,3 +36,19 @@ ESLint and Prettier are both enabled which are linters that flag errors, imprope
 
 This section outlines a checklist of all steps needed to set up a new project using this template.
 
+1. Configure `package.json`
+   1. Set `"description"`
+   2. Set `"repository"`
+   3. Set `"author"`
+   4. Configure `"build"`
+      1. Set `"productName"`
+      2. Set `"extraMetadata:{ "version" }"`
+      3. Set `"appId"`
+      4. Set `"publish"`
+2. Configure `index.ejs`
+   1. Configure your apllication title
+3. Configure your app's icons inside `assets/`
+4. Define your Wolfram Language APIs
+   1. Add any additional endpoints and expressions to `expressions.wl`
+   2. Test using `wolframscript -script ./wl/expressions.wl`
+5. Build your application
