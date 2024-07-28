@@ -34,51 +34,35 @@ const theme = createTheme({
 	},
 });
 
-function Demo() {
+function LoadingScreen() {
+	return (
+		<Stack
+			className="main"
+			direction="column"
+			spacing={2}
+			sx={{ textAlign: 'center', alignContent: 'center' }}
+			justifyContent="center"
+		>
+			<svg>
+				<Spikey />
+			</svg>
+			<Box sx={{ width: '100%' }}>
+				<LinearProgress />
+			</Box>
+		</Stack>
+	);
+}
+
+interface IDemo {
+	isWLActive: boolean;
+}
+function Demo({ isWLActive }: IDemo) {
 	const [evaluator, setEvaluator] = React.useState<
 		'Python' | 'NodeJS' | 'Shell'
 	>('Python');
 	const [evaluatorInput, setEvaluatorInput] = React.useState<string>('');
 	const [wlEvaluatorInput, setWLEvaluatorInput] = React.useState<string>('');
 	const [result, setResult] = React.useState<string | null>(null);
-	const [isReady, setIsReady] = React.useState<boolean>(false);
-	const [isWLActive, setIsWLActive] = React.useState<boolean>(false);
-
-	// eslint-disable-next-line consistent-return
-	const aliveQ = async () => {
-		const resp = await localRequest('aliveQ', {}, 8888).then(
-			(res) => res,
-			() => {
-				// eslint-disable-next-line no-console
-				console.log('ping WL failed');
-			},
-		);
-		const wait = () =>
-			new Promise((resolve) => {
-				setTimeout(() => {
-					resolve('');
-				}, 250);
-			});
-		if (!resp) {
-			setIsWLActive(false);
-			await wait();
-			aliveQ();
-			return;
-		}
-		// eslint-disable-next-line no-console
-		console.log('ping WL succeeded');
-		setIsWLActive(true);
-		setIsReady(true);
-	};
-	React.useEffect(() => {
-		const intervalId = setInterval(() => {
-			if (!isReady) {
-				aliveQ();
-			}
-		}, 1000);
-		return () => clearInterval(intervalId);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
 
 	const handleEvaluatorChange = (e: SelectChangeEvent): void => {
 		setEvaluator(e.target.value as 'Python' | 'NodeJS' | 'Shell');
@@ -110,25 +94,6 @@ function Demo() {
 	): void => {
 		setWLEvaluatorInput(e.target.value as string);
 	};
-
-	if (!isReady) {
-		return (
-			<Stack
-				className="Hello"
-				direction="column"
-				spacing={2}
-				sx={{ textAlign: 'center', alignContent: 'center' }}
-				justifyContent="center"
-			>
-				<svg>
-					<Spikey />
-				</svg>
-				<Box sx={{ width: '100%' }}>
-					<LinearProgress />
-				</Box>
-			</Stack>
-		);
-	}
 
 	return (
 		<Stack
@@ -197,14 +162,57 @@ function Demo() {
 }
 
 export default function App() {
+	const [isLoading, setIsLoading] = React.useState<boolean>(true);
+
+	// eslint-disable-next-line consistent-return
+	const aliveQ = async () => {
+		const resp = await localRequest('aliveQ', {}, 8888).then(
+			(res) => res,
+			() => {
+				// eslint-disable-next-line no-console
+				console.log('ping WL failed');
+			},
+		);
+		const wait = () =>
+			new Promise((resolve) => {
+				setTimeout(() => {
+					resolve('');
+				}, 250);
+			});
+		if (!resp) {
+			await wait();
+			aliveQ();
+			return;
+		}
+		// eslint-disable-next-line no-console
+		console.log('ping WL succeeded');
+		setIsLoading(false);
+	};
+	React.useEffect(() => {
+		const intervalId = setInterval(() => {
+			if (isLoading) {
+				aliveQ();
+			}
+		}, 500);
+		return () => clearInterval(intervalId);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
-			<Router>
-				<Routes>
-					<Route path="/" element={<Demo />} />
-				</Routes>
-			</Router>
+			{isLoading ? (
+				<LoadingScreen />
+			) : (
+				<Router>
+					<Routes>
+						<Route
+							path="/"
+							element={<Demo isWLActive={!isLoading} />}
+						/>
+					</Routes>
+				</Router>
+			)}
 		</ThemeProvider>
 	);
 }
