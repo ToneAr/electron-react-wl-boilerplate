@@ -28,7 +28,7 @@
 	"build": {
 		"productName": "Electron + React + WL",
 		"extraMetadata": {
-			"version": "1.2.0"
+			"version": "1.2.1"
 		},
 		"appId": "ElectronWLReact",
 		"asar": true,
@@ -87,7 +87,8 @@
 			"./assets/**"
 		],
 		"extraFiles": [
-			"./wl/**"
+			"./wl/**",
+			"./public/**"
 		],
 		"publish": {
 			"provider": "github",
