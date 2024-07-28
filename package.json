@@ -87,7 +87,8 @@
 			"./assets/**"
 		],
 		"extraFiles": [
-			"./wl/**"
+			"./wl/**",
+			"./public/**"
 		],
 		"publish": {
 			"provider": "github",

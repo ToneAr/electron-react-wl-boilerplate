@@ -12,10 +12,12 @@ import {
 	FormControl,
 	SelectChangeEvent,
 	Paper,
-	CircularProgress,
 	CssBaseline,
+	Box,
+	LinearProgress,
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ReactComponent as Spikey } from '../../public/spikey.svg';
 
 // Hooks
 import localRequest from '../hooks/localRequest';
@@ -112,14 +114,18 @@ function Demo() {
 	if (!isReady) {
 		return (
 			<Stack
-				className="Hello"
+				className="main"
 				direction="column"
 				spacing={2}
 				sx={{ textAlign: 'center', alignContent: 'center' }}
 				justifyContent="center"
 			>
-				<Typography variant="h3">Loading...</Typography>
-				<CircularProgress size={60} />
+				<svg>
+					<Spikey />
+				</svg>
+				<Box sx={{ width: '100%' }}>
+					<LinearProgress />
+				</Box>
 			</Stack>
 		);
 	}
