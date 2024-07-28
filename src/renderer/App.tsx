@@ -114,7 +114,7 @@ function Demo() {
 	if (!isReady) {
 		return (
 			<Stack
-				className="main"
+				className="Hello"
 				direction="column"
 				spacing={2}
 				sx={{ textAlign: 'center', alignContent: 'center' }}
