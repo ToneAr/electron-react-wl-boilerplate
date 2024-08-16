@@ -141,7 +141,11 @@ function startWL() {
 	console.log(`WL pid: ${wlProc.pid}`);
 
 	wlProc.stdout.on('data', (data) => {
-		console.log(`WL stdout: ${data}`);
+		const dataStr = data.toString().trim();
+		console.log(`WL stdout: ${dataStr}`);
+		if (dataStr === `"Type 'exit' to end process:"`) {
+			mainWindow?.webContents.send('wl-status', 0);
+		}
 	});
 	wlProc.stderr.on('data', (err) => {
 		console.log(`WL stderr: ${err}`);
@@ -152,6 +156,7 @@ function startWL() {
 			'wolframscript has quit unexpectedly',
 			'Will attempt to restart the process.',
 		);
+		mainWindow?.webContents.send('wl-status', code);
 		startWL();
 	});
 }
