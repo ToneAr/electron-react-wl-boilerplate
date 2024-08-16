@@ -164,39 +164,17 @@ function Demo({ isWLActive }: IDemo) {
 export default function App() {
 	const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
-	// eslint-disable-next-line consistent-return
-	const aliveQ = async () => {
-		const resp = await localRequest('aliveQ', {}, 8888).then(
-			(res) => res,
-			() => {
-				// eslint-disable-next-line no-console
-				console.log('ping WL failed');
-			},
-		);
-		const wait = () =>
-			new Promise((resolve) => {
-				setTimeout(() => {
-					resolve('');
-				}, 250);
-			});
-		if (!resp) {
-			await wait();
-			aliveQ();
-			return;
-		}
-		// eslint-disable-next-line no-console
-		console.log('ping WL succeeded');
-		setIsLoading(false);
-	};
 	React.useEffect(() => {
-		const intervalId = setInterval(() => {
-			if (isLoading) {
-				aliveQ();
+		window.electron.ipcRenderer.on('wl-status', (code) => {
+			if (code === 0) {
+				console.log('WL Ready');
+				setIsLoading(false);
+			} else {
+				setIsLoading(true);
+				throw new Error(`wolframscript returned code: ${code}`);
 			}
-		}, 500);
-		return () => clearInterval(intervalId);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+		});
+	});
 
 	return (
 		<ThemeProvider theme={theme}>
