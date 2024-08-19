@@ -5,7 +5,7 @@ SetDirectory[ DirectoryName[$InputFileName] ];
 EchoTemporaryCLI[
 	Quiet[
 		If[FailureQ@PacletObject["LocalDeploy"],
-			PacletInstall[CloudObject["PacletSites/Wolfram/LocalDeploy"]]
+			PacletInstall[CloudObject["user:tonya/PacletSites/Wolfram/LocalDeploy"]]
 		],
 		PacletInstall::samevers
 	];

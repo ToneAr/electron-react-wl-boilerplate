@@ -28,7 +28,7 @@
 	"build": {
 		"productName": "Electron + React + WL",
 		"extraMetadata": {
-			"version": "1.2.4"
+			"version": "1.2.5"
 		},
 		"appId": "ElectronWLReact",
 		"asar": true,
