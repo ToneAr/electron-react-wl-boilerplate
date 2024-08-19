@@ -165,7 +165,7 @@ export default function App() {
 	const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
 	React.useEffect(() => {
-		window.electron.ipcRenderer.on('wl-status', (code) => {
+		window.electron?.ipcRenderer.on('wl-status', (code) => {
 			if (code === 0) {
 				console.log('WL Ready');
 				setIsLoading(false);
