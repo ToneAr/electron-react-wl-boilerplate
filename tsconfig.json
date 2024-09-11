@@ -12,7 +12,14 @@
 		"allowSyntheticDefaultImports": true,
 		"resolveJsonModule": true,
 		"allowJs": true,
-		"outDir": ".misc/dll"
+		"outDir": "./out",
+		"noImplicitAny": false,
+		"paths": {
+			"react": ["./node_modules/@types/react"]
+		}
 	},
-	"exclude": ["test", "release/build", "release/app/dist", ".misc/dll"]
+	"references": [
+		{ "path": "./tsconfig.node.json" },
+		{ "path": "./tsconfig.web.json" }
+	]
 }

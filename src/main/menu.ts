@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import {
 	app,
 	Menu,
@@ -265,7 +266,7 @@ export default class MenuBuilder {
 										this.mainWindow.webContents.toggleDevTools();
 									},
 								},
-						  ]
+							]
 						: [
 								{
 									label: 'Toggle &Full Screen',
@@ -276,7 +277,7 @@ export default class MenuBuilder {
 										);
 									},
 								},
-						  ],
+							],
 			},
 			{
 				label: 'Help',

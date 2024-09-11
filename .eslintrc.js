@@ -1,8 +1,17 @@
 module.exports = {
-	extends: 'erb',
+	extends: [
+		'eslint:recommended',
+		'plugin:react/recommended',
+		'plugin:react/jsx-runtime',
+		'@electron-toolkit/eslint-config-ts/recommended',
+		'@electron-toolkit/eslint-config-prettier',
+	],
 	plugins: ['@typescript-eslint'],
 	rules: {
 		// A temporary hack related to IDE not resolving correct package.json
+		'@typescript-eslint/no-explicit-any': 'off',
+		'@typescript-eslint/explicit-function-return-type': 'off',
+		'@typescript/explicit-function-return-type': 'off',
 		'import/no-extraneous-dependencies': 'off',
 		'react/react-in-jsx-scope': 'off',
 		'react/jsx-filename-extension': 'off',
@@ -24,11 +33,6 @@ module.exports = {
 			node: {
 				extensions: ['.js', '.jsx', '.ts', '.tsx'],
 				moduleDirectory: ['node_modules', 'src/'],
-			},
-			webpack: {
-				config: require.resolve(
-					'./.misc/configs/webpack.config.eslint.ts',
-				),
 			},
 			typescript: {},
 		},

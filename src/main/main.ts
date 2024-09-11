@@ -1,5 +1,3 @@
-/* eslint global-require: off, no-console: off, promise/always-return: off */
-
 /**
  * This module executes inside of electron's main process. You can start
  * electron renderer process from here and communicate with the other processes
@@ -15,6 +13,7 @@ import log from 'electron-log';
 import nodeChildProcess from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+// import { resolveHtmlPath } from './util';
 
 class AppUpdater {
 	constructor() {
@@ -38,6 +37,7 @@ if (isDebug) {
 	require('electron-debug')();
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const installExtensions = async () => {
 	const installer = require('electron-devtools-installer');
 	const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -51,6 +51,7 @@ const installExtensions = async () => {
 		.catch(console.log);
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const createWindow = async () => {
 	if (isDebug) {
 		await installExtensions();
@@ -72,9 +73,8 @@ const createWindow = async () => {
 		// resizable: true,
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
-			preload: app.isPackaged
-				? path.join(__dirname, 'preload.js')
-				: path.join(__dirname, '../../.misc/dll/preload.js'),
+			contextIsolation: true,
+			preload: path.join(__dirname, 'preload.js'),
 		},
 	});
 
@@ -115,7 +115,7 @@ const createWindow = async () => {
  */
 
 ipcMain.on('ipc-example', async (event, arg) => {
-	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+	const msgTemplate = (pingPong: string): string => `IPC test: ${pingPong}`;
 	console.log(msgTemplate(arg));
 	event.reply('ipc-example', msgTemplate('pong'));
 });
@@ -129,13 +129,13 @@ function checkWL(): boolean {
 		return false;
 	}
 }
-function startWL() {
-	const wlProc = nodeChildProcess.spawn('wolframscript.exe', [
+function startWL(): void {
+	const wlProc = nodeChildProcess.spawn('wolframscript', [
 		'-noinit',
 		'-noprompt',
 		'-rawterm',
 		'-script',
-		'./wl/deploy.wls',
+		`${app.isPackaged ? './../../' : '.'}'/wl/deploy.wls'`,
 	]);
 
 	console.log(`WL pid: ${wlProc.pid}`);
@@ -169,6 +169,21 @@ if (!checkWL()) {
 }
 ipcMain.on('start-wl', startWL);
 // ---------
+
+// Zoom
+ipcMain.handle(
+	'change-zoom-level',
+	(_event, we: { deltaY: number; ctrlKey: boolean }) => {
+		if (we.ctrlKey) {
+			const zoomFactor = mainWindow?.webContents.getZoomFactor() ?? 1;
+			const delta = we.deltaY > 0 ? -0.1 : 0.1;
+			const newZoom = Math.max(0.1, zoomFactor + delta);
+			console.log('Zoom:', `${newZoom * 100}%`);
+			mainWindow?.webContents.setZoomFactor(newZoom);
+		}
+	},
+);
+// ------
 
 app.on('window-all-closed', () => {
 	// Respect the OSX convention of having the application in memory even
