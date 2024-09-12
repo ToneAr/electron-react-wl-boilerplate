@@ -88,17 +88,19 @@
 			{
 				"from": "assets/",
 				"to": "app/assets/",
-				"filter": ["**/*"]
+				"filter": [
+					"**/*"
+				]
 			},
 			{
 				"from": "wl/",
 				"to": "app/wl/",
-				"filter": ["**/*"]
+				"filter": [
+					"**/*"
+				]
 			}
 		],
-		"extraFiles": [
-
-		],
+		"extraFiles": [],
 		"publish": {
 			"provider": "github",
 			"owner": "ToneAr",
@@ -137,9 +139,7 @@
 			"\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/.misc/mocks/fileMock.js",
 			"\\.(css|less|sass|scss)$": "identity-obj-proxy"
 		},
-		"setupFiles": [
-
-		],
+		"setupFiles": [],
 		"testEnvironment": "jsdom",
 		"testEnvironmentOptions": {
 			"url": "http://localhost/"
@@ -223,7 +223,6 @@
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-router-dom": "^6.16.0",
-		"react-refresh": "^0.14.0",
 		"react-test-renderer": "^18.2.0",
 		"rimraf": "^5.0.1",
 		"sass": "^1.67.0",

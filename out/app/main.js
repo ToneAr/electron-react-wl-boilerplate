@@ -367,6 +367,7 @@ electron.ipcMain.on("ipc-example", async (event, arg) => {
   console.log(msgTemplate(arg));
   event.reply("ipc-example", msgTemplate("pong"));
 });
+let wlProc = null;
 function checkWL() {
   try {
     nodeChildProcess.execSync("wolframscript -version");
@@ -376,7 +377,7 @@ function checkWL() {
   }
 }
 function startWL() {
-  const wlProc = nodeChildProcess.spawn("wolframscript", [
+  wlProc = nodeChildProcess.spawn("wolframscript", [
     "-noinit",
     "-noprompt",
     "-rawterm",
@@ -404,6 +405,13 @@ function startWL() {
     startWL();
   });
 }
+function cleanupWL() {
+  if (wlProc) {
+    console.log("Terminating Wolfram Language process");
+    wlProc.kill();
+    wlProc = null;
+  }
+}
 if (!checkWL()) {
   electron.dialog.showErrorBox(
     "wolframscript not found",
@@ -412,6 +420,9 @@ if (!checkWL()) {
   electron.app.exit(1);
 }
 electron.ipcMain.on("start-wl", startWL);
+electron.app.on("will-quit", () => {
+  cleanupWL();
+});
 electron.ipcMain.handle(
   "change-zoom-level",
   (_event, we) => {
@@ -426,6 +437,7 @@ electron.ipcMain.handle(
 );
 electron.app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    cleanupWL();
     electron.app.quit();
   }
 });

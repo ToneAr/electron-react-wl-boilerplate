@@ -13,6 +13,7 @@ import log from 'electron-log';
 import nodeChildProcess from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import * as os from 'os';
 // import { resolveHtmlPath } from './util';
 
 class AppUpdater {
@@ -120,7 +121,10 @@ ipcMain.on('ipc-example', async (event, arg) => {
 	event.reply('ipc-example', msgTemplate('pong'));
 });
 
-// Wolfram Language
+// ----- Wolfram Language -----
+let wlProc: nodeChildProcess.ChildProcessWithoutNullStreams | null = null;
+let isQuitting = false;
+
 function checkWL(): boolean {
 	try {
 		nodeChildProcess.execSync('wolframscript -version');
@@ -130,13 +134,21 @@ function checkWL(): boolean {
 	}
 }
 function startWL(): void {
-	const wlProc = nodeChildProcess.spawn('wolframscript', [
-		'-noinit',
-		'-noprompt',
-		'-rawterm',
-		'-script',
-		`${app.isPackaged ? './../../' : '.'}'/wl/deploy.wls'`,
-	]);
+	if (isQuitting) return;
+
+	wlProc = nodeChildProcess.spawn(
+		'wolframscript',
+		[
+			'-noinit',
+			'-noprompt',
+			'-rawterm',
+			'-script',
+			`${app.isPackaged ? './../../' : '.'}'/wl/deploy.wls'`,
+		],
+		{
+			detached: true,
+		},
+	);
 
 	console.log(`WL pid: ${wlProc.pid}`);
 
@@ -151,15 +163,40 @@ function startWL(): void {
 		console.log(`WL stderr: ${err}`);
 	});
 	wlProc.on('exit', (code) => {
-		console.log(`WL exit code: ${code}`);
-		dialog.showErrorBox(
-			'wolframscript has quit unexpectedly',
-			'Will attempt to restart the process.',
-		);
-		mainWindow?.webContents.send('wl-status', code);
-		startWL();
+		if (!isQuitting) {
+			console.log(`WL exit code: ${code}`);
+			dialog.showErrorBox(
+				'wolframscript has quit unexpectedly',
+				'Will attempt to restart the process.',
+			);
+			mainWindow?.webContents.send('wl-status', code);
+			startWL();
+		}
 	});
 }
+function cleanupWL(): void {
+	if (wlProc && wlProc.pid) {
+		console.log('Terminating Wolfram Language process');
+		isQuitting = true;
+		try {
+			// treeKill(wlProc.pid, 'SIGKILL', (err) => {
+			// 	console.error(
+			// 		'Error terminating Wolfram Language process tree:',
+			// 		err,
+			// 	);
+			// });
+			process.kill(
+				// Make PID negative if on Unix systems to close entire process group
+				wlProc.pid * (os.platform() === 'win32' ? 1 : -1),
+				'SIGKILL',
+			);
+		} catch (error) {
+			console.error('Error terminating Wolfram Language process:', error);
+		}
+		wlProc = null;
+	}
+}
+
 if (!checkWL()) {
 	dialog.showErrorBox(
 		'wolframscript not found',
@@ -168,9 +205,12 @@ if (!checkWL()) {
 	app.exit(1);
 }
 ipcMain.on('start-wl', startWL);
-// ---------
+app.on('will-quit', () => {
+	cleanupWL();
+});
+// -------------------------
 
-// Zoom
+// ----- Window Zoom ------
 ipcMain.handle(
 	'change-zoom-level',
 	(_event, we: { deltaY: number; ctrlKey: boolean }) => {
@@ -183,18 +223,19 @@ ipcMain.handle(
 		}
 	},
 );
-// ------
+// ------------------------
 
 app.on('window-all-closed', () => {
 	// Respect the OSX convention of having the application in memory even
 	// after all windows have been closed
 	if (process.platform !== 'darwin') {
+		cleanupWL();
 		app.quit();
 	}
 });
-
 app.whenReady()
 	.then(() => {
+		isQuitting = false;
 		createWindow();
 		app.on('activate', () => {
 			// On macOS it's common to re-create a window in the app when the
