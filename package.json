@@ -33,7 +33,7 @@
 			"version": "2.0.0"
 		},
 		"appId": "ElectronWLReact",
-		"asar": false,
+		"asar": true,
 		"asarUnpack": "**\\*.{node,dll}",
 		"files": [
 			"node_modules",
