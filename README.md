@@ -1,12 +1,13 @@
 # electron-react-wl-boilerplate
 
-Slightly trimmed down version of [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) with added Wolfram Language integrations making use of [LocalDeploy](https://github.com/ToneAr/LocalDeploy).
+Incorporating elements from both [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) and the create-electron template [react-ts](https://github.com/alex8088/quick-start/tree/master/packages/create-electron/playground/react-ts) with Wolfram Language integrations making use of [LocalDeploy](https://github.com/ToneAr/LocalDeploy) for an electron boilerplate project using react & typescript for the front end,
+node for window management and WolframLanguage as a back-end.
 
 ## Development & Building
 
-During development, the application can be tested using `npm start`. This runs the project in the development environment.
+During development, the application can be tested using `yarn start`. This runs the project in the development environment.
 
-Packaging the application for distribution can be done by running `npm run package`.
+Packaging the application for distribution can be done by running `yarn build:{target_os}` eg. `yarn build:linux`.
 
 ## Wolfram Language
 
@@ -47,7 +48,7 @@ This section outlines a checklist of all steps needed to set up a new project us
         2. Set `"extraMetadata:{ "version" }"`
         3. Set `"appId"`
         4. Set `"publish"`
-2. Configure `index.ejs`
+2. Configure `index.html`
     1. Configure your apllication title
 3. Configure your app's icons inside `assets/`
 4. Define your Wolfram Language APIs
